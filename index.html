@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Program Referral — Undang Teman Dapat Hadiah</title>
+  <!-- Font Awesome (Latest) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1218; --card:#151a22; --accent:#4f8cff; --accent2:#00c2a8;
+      --text:#e6ebf5; --muted:#9aa4b2; --danger:#ff4d6d; --warn:#f8c94e; --success:#2ecc71;
+      --border:#243041; --shadow:0 6px 20px rgba(0,0,0,0.35);
+      --radius:16px; --radius-sm:12px; --radius-xs:8px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;background:linear-gradient(180deg,#0c1016,#0f1218),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
+    body{margin:0;display:flex;flex-direction:column}
+    a{color:var(--accent);text-decoration:none}
+    .container{flex:1;display:flex;flex-direction:column;max-width:960px;margin:0 auto;width:100%}
+    header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);backdrop-filter:blur(6px);position:sticky;top:0;background:rgba(15,18,24,0.75);z-index:9}
+    header .brand{display:flex;gap:12px;align-items:center}
+    header .brand .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#4f8cff,#00c2a8);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:var(--shadow)}
+    header .brand .title{font-weight:700;letter-spacing:.3px}
+    header .actions{display:flex;gap:12px}
+    .btn{padding:10px 14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+    .btn.secondary{background:#1b2433;color:var(--text);border:1px solid var(--border)}
+    .btn.success{background:var(--success)}
+    .btn.warn{background:var(--warn);color:#101316}
+    .btn.danger{background:var(--danger)}
+    .btn:active{transform:scale(.98)}
+    .content{padding:18px}
+    .card{background:linear-gradient(180deg,#131822,#151a22);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .col-12{grid-column:span 12}
+    .col-6{grid-column:span 6}
+    .col-4{grid-column:span 4}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .muted{color:var(--muted)}
+    .balance{font-size:28px;font-weight:800;letter-spacing:.4px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#1b2433;color:var(--text);border:1px solid var(--border)}
+    .nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,18,24,.88);border-top:1px solid var(--border);backdrop-filter:blur(6px);z-index:9}
+    .nav ul{display:flex;margin:0;padding:0;list-style:none}
+    .nav li{flex:1}
+    .nav button{width:100%;padding:10px 6px;background:transparent;border:none;color:var(--muted);display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;font-weight:600}
+    .nav button.active{color:#fff}
+    .section{display:none}
+    .section.active{display:block}
+    .hero{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .hero .hello{font-size:20px;font-weight:700}
+    .hero .ref{display:flex;align-items:center;gap:10px}
+    .list{display:flex;flex-direction:column;gap:12px}
+    .list-item{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;background:#121724;border:1px solid var(--border)}
+    .list-item .left{display:flex;gap:12px;align-items:center}
+    .icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#1b2433;border:1px solid var(--border)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:99}
+    .modal{width:92%;max-width:620px;background:#121724;border:1px solid var(--border);box-shadow:var(--shadow);border-radius:16px;padding:18px}
+    .modal h3{margin:0 0 8px}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .field label{font-size:13px;color:var(--muted)}
+    .field input,.field select,.field textarea{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);background:#0e1218;color:var(--text);outline:none}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:#2b3a4f}
+    .inline{display:flex;gap:10px;align-items:center}
+    .hidden{display:none}
+    canvas{background:#0c1016;border:1px solid var(--border);border-radius:12px;width:100%;max-width:360px}
+    /* Anti-copy selection */
+    body, .card, .list, header, .nav { -webkit-user-select: none; user-select: none; }
+    /* Responsive */
+    @media (max-width:768px){
+      .col-6{grid-column:span 12}
+      .col-4{grid-column:span 12}
+      .hero{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo"><i class="fa-solid fa-link"></i></div>
+        <div class="title">Referral Rewards</div>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="logoutBtn" style="display:none"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Auth -->
+      <section id="authSection" class="section active">
+        <div class="grid">
+          <div class="col-12">
+            <div class="card">
+              <h2>Masuk</h2>
+              <p class="muted">Gunakan <b>username</b> & <b>password</b>.</p>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="contoh: cupz">
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+              </div>
+              <div class="inline">
+                <button class="btn" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Masuk</button>
+                <button class="btn secondary" id="goRegisterBtn"><i class="fa-solid fa-user-plus"></i> Daftar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 hidden" id="registerCard">
+            <div class="card">
+              <h2>Daftar Akun</h2>
+              <p class="muted">Jika belum punya akun, daftar dengan nomor & username.</p>
+              <div class="field">
+                <label>Nomor (HP)</label>
+                <input type="tel" id="regPhone" placeholder="08xxxxxxxxxx">
+              </div>
+              <div class="field">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="username unik">
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="minimal 6 karakter">
+              </div>
+              <div class="field">
+                <label>Konfirmasi Password</label>
+                <input type="password" id="regConfirm" placeholder="ketik ulang password">
+              </div>
+              <button class="btn success" id="registerBtn"><i class="fa-solid fa-user-check"></i> Buat Akun</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- App -->
+      <section id="appSection" class="section">
+        <!-- Home -->
+        <div id="homeTab" class="section active">
+          <div class="card">
+            <div class="hero">
+              <div>
+                <div class="hello">Halo, <span id="helloName">Pengguna</span> 👋</div>
+                <div class="muted">Selamat datang di program referral — undang teman & menangkan hadiah dari misi seru.</div>
+              </div>
+              <div class="ref">
+                <span class="chip"><i class="fa-solid fa-user-group"></i> Referral: <b id="refCount">0</b></span>
+                <button class="btn secondary" id="copyRefLink"><i class="fa-solid fa-share-nodes"></i> Salin Link</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="col-6">
+              <div class="card">
+                <div class="muted">Saldo anda</div>
+                <div class="balance">Rp <span id="balance">0</span></div>
+                <div class="muted">Kumpulkan hadiah dari misi, undang teman, dan tarik ke e-wallet anda.</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <div class="muted">Info</div>
+                <div id="modalPreviewText">—</div>
+                <div class="row" style="margin-top:8px">
+                  <button class="btn" id="openInfoModal"><i class="fa-solid fa-circle-info"></i> Lihat Info</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Fitur</h3>
+            <div class="list">
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-gamepad"></i></div><div>Misi permainan berhadiah</div></div>
+                <button class="btn" data-nav="misi"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-clock-rotate-left"></i></div><div>Riwayat penarikan</div></div>
+                <button class="btn" data-nav="riwayat"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-wallet"></i></div><div>Penarikan e-wallet</div></div>
+                <button class="btn" data-nav="penarikan"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-gear"></i></div><div>Pengaturan akun</div></div>
+                <button class="btn" data-nav="pengaturan"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Misi -->
+        <div id="misiTab" class="section">
+          <div class="card">
+            <h3>Misi permainan berhadiah</h3>
+            <p class="muted">Menang untuk dapat hadiah acak Rp 150/200/250/300 (atau sesuai pengaturan admin).</p>
+            <div class="list">
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-dragon"></i></div><div>Snake</div></div>
+                <button class="btn secondary" id="openSnake">Main</button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-puzzle-piece"></i></div><div>Teka-teki</div></div>
+                <button class="btn secondary" id="openRiddle">Main</button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-square-root-variable"></i></div><div>Matematika</div></div>
+                <button class="btn secondary" id="openMath">Main</button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-language"></i></div><div>Quiz Bahasa Inggris</div></div>
+                <button class="btn secondary" id="openQuizEN">Main</button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-user-plus"></i></div><div>Undang teman</div></div>
+                <button class="btn secondary" id="openInvite">Undang</button>
+              </div>
+              <div class="list-item">
+                <div class="left"><div class="icon"><i class="fa-solid fa-book"></i></div><div>Quiz Bahasa Indonesia</div></div>
+                <button class="btn secondary" id="openQuizID">Main</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snake modal -->
+          <div class="card hidden" id="snakeCard">
+            <h3>Snake</h3>
+            <p class="muted">Gunakan tombol arah pada keyboard atau kontrol di bawah.</p>
+            <canvas id="snakeCanvas" width="240" height="240"></canvas>
+            <div class="row" style="margin-top:8px">
+              <button class="btn" id="upBtn"><i class="fa-solid fa-arrow-up"></i></button>
+              <button class="btn" id="leftBtn"><i class="fa-solid fa-arrow-left"></i></button>
+              <button class="btn" id="rightBtn"><i class="fa-solid fa-arrow-right"></i></button>
+              <button class="btn" id="downBtn"><i class="fa-solid fa-arrow-down"></i></button>
+              <button class="btn success" id="startSnake"><i class="fa-solid fa-play"></i> Mulai</button>
+            </div>
+            <div id="snakeStatus" class="muted" style="margin-top:6px">—</div>
+          </div>
+        </div>
+
+        <!-- Riwayat -->
+        <div id="riwayatTab" class="section">
+          <div class="card">
+            <h3>Riwayat penarikan</h3>
+            <div id="historyList" class="list"></div>
+          </div>
+        </div>
+
+        <!-- Penarikan -->
+        <div id="penarikanTab" class="section">
+          <div class="card">
+            <h3>Tarik ke e-wallet</h3>
+            <p class="muted">Isi data e-wallet dan pilih nominal penarikan.</p>
+            <div class="field">
+              <label>Nomor rekening / e-wallet</label>
+              <input type="text" id="walletNumber" placeholder="contoh: 081234567890">
+            </div>
+            <div class="field">
+              <label>Nama sesuai rekening</label>
+              <input type="text" id="walletName" placeholder="Nama lengkap">
+            </div>
+            <div class="field">
+              <label>Pilih jumlah</label>
+              <div class="row" id="amountOptions"></div>
+              <small class="muted" id="withdrawRequirement">—</small>
+            </div>
+            <button class="btn success" id="requestWithdraw"><i class="fa-solid fa-money-bill-transfer"></i> Tarik Uang</button>
+            <div class="muted" style="margin-top:8px">
+              Status: Pending setelah ajukan, Sukses setelah dikonfirmasi admin. Nominal Rp 15.000 / 30.000 membutuhkan undangan aktif sesuai syarat.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Pengajuan saya</h3>
+            <div id="myWithdraws" class="list"></div>
+          </div>
+        </div>
+
+        <!-- Pengaturan -->
+        <div id="pengaturanTab" class="section">
+          <div class="card">
+            <h3>Akun & saldo</h3>
+            <div class="list">
+              <div class="list-item">
+                <div class="left">
+                  <div class="icon"><i class="fa-solid fa-user"></i></div>
+                  <div>
+                    <div id="accUsername">—</div>
+                    <div class="muted">Saldo: Rp <span id="accBalance">0</span> • Referral: <span id="accRef">0</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="col-6">
+              <div class="card">
+                <h3>Ubah password baru</h3>
+                <div class="field">
+                  <label>Password saat ini</label>
+                  <input type="password" id="curPass" placeholder="••••••••">
+                </div>
+                <div class="field">
+                  <label>Password baru</label>
+                  <input type="password" id="newPass" placeholder="minimal 6 karakter">
+                </div>
+                <button class="btn warn" id="changePassBtn"><i class="fa-solid fa-key"></i> Ubah Password</button>
+                <div id="changePassMsg" class="muted" style="margin-top:6px">—</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <h3>Ubah data akun rekening</h3>
+                <div class="field">
+                  <label>Nomor rekening / e-wallet</label>
+                  <input type="text" id="setWalletNumber" placeholder="081234567890">
+                </div>
+                <div class="field">
+                  <label>Nama sesuai rekening</label>
+                  <input type="text" id="setWalletName" placeholder="Nama lengkap">
+                </div>
+                <button class="btn warn" id="saveWalletBtn"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
+                <div id="saveWalletMsg" class="muted" style="margin-top:6px">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="nav" id="bottomNav" style="display:none">
+      <ul>
+        <li><button data-nav="home" class="active"><i class="fa-solid fa-house"></i><span>Home</span></button></li>
+        <li><button data-nav="misi"><i class="fa-solid fa-gamepad"></i><span>Misi</span></button></li>
+        <li><button data-nav="riwayat"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></button></li>
+        <li><button data-nav="penarikan"><i class="fa-solid fa-wallet"></i><span>Penarikan</span></button></li>
+        <li><button data-nav="pengaturan"><i class="fa-solid fa-gear"></i><span>Pengaturan</span></button></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Modal info -->
+  <div class="modal-backdrop" id="infoBackdrop">
+    <div class="modal">
+      <h3>Informasi</h3>
+      <div id="infoText">—</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="closeInfo">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== Storage & Config ======
+    const LS = {
+      usersKey: 'rr_users',
+      sessionKey: 'rr_session',
+      configKey: 'rr_config',
+      withdrawKey: 'rr_withdraws',
+      historyKey: 'rr_history' // per user activity snapshot
+    };
+
+    const DefaultConfig = {
+      modalText: 'Selamat datang! Mainkan misi, undang teman, dan tarik saldo ke e-wallet. Jaga fair play: dilarang cheat.',
+      rewards: { // admin can override exact rewards or boundaries
+        snake: [150,200,250,300],
+        riddle: [150,200,250,300],
+        math: [150,200,250,300],
+        quizEN: [150,200,250,300],
+        quizID: [150,200,250,300],
+        invite: [150,200,250,300]
+      },
+      withdrawOptions: [200,2000,3500,15000,30000],
+      minInviteFor15000: 5,
+      minInviteFor30000: 10,
+      antiCheatEnabled: true
+    };
+
+    function getConfig(){
+      const c = JSON.parse(localStorage.getItem(LS.configKey)||'null');
+      if(!c){ localStorage.setItem(LS.configKey, JSON.stringify(DefaultConfig)); return DefaultConfig; }
+      return c;
+    }
+    function setConfig(cfg){ localStorage.setItem(LS.configKey, JSON.stringify(cfg)); }
+
+    function getUsers(){ return JSON.parse(localStorage.getItem(LS.usersKey)||'[]'); }
+    function setUsers(arr){ localStorage.setItem(LS.usersKey, JSON.stringify(arr)); }
+
+    function getWithdraws(){ return JSON.parse(localStorage.getItem(LS.withdrawKey)||'[]'); }
+    function setWithdraws(arr){ localStorage.setItem(LS.withdrawKey, JSON.stringify(arr)); }
+
+    function setSession(username){ localStorage.setItem(LS.sessionKey, username); }
+    function getSession(){ return localStorage.getItem(LS.sessionKey); }
+    function clearSession(){ localStorage.removeItem(LS.sessionKey); }
+
+    function uid(){ return 'u_'+Math.random().toString(36).slice(2,10); }
+    function wid(){ return 'w_'+Math.random().toString(36).slice(2,10); }
+
+    function hash(s){ // lightweight hash (NOT crypto) for demo
+      let h=0; for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i); h|=0;}
+      return 'h'+Math.abs(h);
+    }
+
+    function findUser(username){
+      return getUsers().find(u=>u.username.toLowerCase()===username.toLowerCase());
+    }
+
+    function saveUser(u){
+      const arr=getUsers();
+      const idx=arr.findIndex(x=>x.username.toLowerCase()===u.username.toLowerCase());
+      if(idx>=0){ arr[idx]=u; } else { arr.push(u); }
+      setUsers(arr);
+    }
+
+    // ====== UI Helpers ======
+    const el = id => document.getElementById(id);
+    function showSection(id){
+      document.querySelectorAll('main .section').forEach(s=>s.classList.remove('active'));
+      el(id).classList.add('active');
+    }
+    function showTab(id){
+      document.querySelectorAll('#appSection .section').forEach(s=>s.classList.remove('active'));
+      el(id+'Tab').classList.add('active');
+      document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+      const btn = document.querySelector('.nav button[data-nav="'+id+'"]'); if(btn) btn.classList.add('active');
+    }
+    function money(n){ return (n||0).toLocaleString('id-ID'); }
+
+    // ====== Auth ======
+    const loginBtn = el('loginBtn');
+    const goRegisterBtn = el('goRegisterBtn');
+    const registerCard = el('registerCard');
+    const registerBtn = el('registerBtn');
+    const logoutBtn = el('logoutBtn');
+
+    goRegisterBtn.onclick = ()=> { registerCard.classList.remove('hidden'); window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); };
+
+    loginBtn.onclick = ()=>{
+      const username = el('loginUsername').value.trim();
+      const password = el('loginPassword').value;
+      const u = findUser(username);
+      if(!u || u.passwordHash!==hash(password)){
+        alert('Username atau password salah.');
+        return;
+      }
+      setSession(u.username);
+      afterLogin(u);
+    };
+
+    registerBtn.onclick = ()=>{
+      const phone = el('regPhone').value.trim();
+      const username = el('regUsername').value.trim();
+      const pass = el('regPassword').value;
+      const conf = el('regConfirm').value;
+      if(!phone || !username || !pass || !conf){ alert('Lengkapi semua data.'); return; }
+      if(pass.length<6){ alert('Password minimal 6 karakter.'); return; }
+      if(pass!==conf){ alert('Konfirmasi password tidak cocok.'); return; }
+      if(findUser(username)){ alert('Username sudah digunakan.'); return; }
+      const u = {
+        id: uid(),
+        phone, username,
+        passwordHash: hash(pass),
+        balance: 0,
+        referrals: 0,
+        wallet: { number:'', name:'' },
+        history: [], // actions (misi, withdraw)
+        createdAt: Date.now()
+      };
+      saveUser(u);
+      alert('Akun dibuat. Silakan masuk.');
+      registerCard.classList.add('hidden');
+      el('loginUsername').value = username;
+    };
+
+    logoutBtn.onclick = ()=>{ clearSession(); location.reload(); };
+
+    function afterLogin(u){
+      // Show modal info if present
+      const cfg = getConfig();
+      el('infoText').textContent = cfg.modalText || DefaultConfig.modalText;
+      el('modalPreviewText').textContent = cfg.modalText || DefaultConfig.modalText;
+      el('infoBackdrop').style.display = 'flex';
+
+      // Switch UI
+      el('authSection').classList.remove('active');
+      el('appSection').classList.add('active');
+      el('bottomNav').style.display='block';
+      logoutBtn.style.display='inline-flex';
+
+      // Bind data
+      el('helloName').textContent = u.username;
+      el('refCount').textContent = u.referrals||0;
+      el('balance').textContent = money(u.balance);
+      el('accUsername').textContent = u.username;
+      el('accBalance').textContent = money(u.balance);
+      el('accRef').textContent = u.referrals||0;
+
+      // Wallet defaults into fields
+      el('walletNumber').value = u.wallet?.number||'';
+      el('walletName').value = u.wallet?.name||'';
+      el('setWalletNumber').value = u.wallet?.number||'';
+      el('setWalletName').value = u.wallet?.name||'';
+
+      renderAmounts(u);
+      renderHistory(u);
+      renderMyWithdraws(u);
+    }
+
+    // Auto session
+    window.addEventListener('load', ()=>{
+      const s = getSession();
+      if(s){
+        const u = findUser(s);
+        if(u){ afterLogin(u); } else { clearSession(); }
+      }
+      // Anti cheat basic
+      initAntiCheat();
+    });
+
+    // Modal info
+    el('openInfoModal').onclick = ()=>{ el('infoBackdrop').style.display='flex'; };
+    el('closeInfo').onclick = ()=>{ el('infoBackdrop').style.display='none'; };
+
+    // Nav actions
+    document.querySelectorAll('.nav button, .card button[data-nav]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t = btn.getAttribute('data-nav');
+        showTab(t);
+      });
+    });
+
+    // Copy referral
+    el('copyRefLink').onclick = ()=>{
+      const u = findUser(getSession());
+      const link = location.origin + location.pathname + '?ref=' + encodeURIComponent(u?.username||'');
+      navigator.clipboard.writeText(link).then(()=>{
+        alert('Link referral disalin:\n' + link);
+      }).catch(()=>alert('Tidak bisa menyalin otomatis.\n'+link));
+    };
+
+    // ====== Amount rendering & rules ======
+    function renderAmounts(u){
+      const cfg = getConfig();
+      const wrap = el('amountOptions');
+      wrap.innerHTML='';
+      const options = cfg.withdrawOptions.slice();
+      // First-time 200 only once: if already withdrawn 200, remove
+      const myWithdraws = getWithdraws().filter(w=>w.userId===u.id);
+      const has200 = myWithdraws.some(w=>w.amount===200);
+      if(has200){ const idx=options.indexOf(200); if(idx>=0) options.splice(idx,1); }
+      options.forEach(val=>{
+        const b = document.createElement('button');
+        b.className='btn secondary';
+        b.textContent='Rp '+money(val);
+        b.dataset.amount=val;
+        wrap.appendChild(b);
+      });
+      // Requirement hint
+      el('withdrawRequirement').textContent = `Syarat: Rp 15.000 butuh ${cfg.minInviteFor15000} undangan, Rp 30.000 butuh ${cfg.minInviteFor30000} undangan.`;
+      // Selectable
+      wrap.querySelectorAll('button').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          wrap.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+        });
+      });
+    }
+
+    // ====== Withdraw request ======
+    el('requestWithdraw').onclick = ()=>{
+      const session = getSession(); if(!session){ alert('Masuk terlebih dahulu.'); return; }
+      const u = findUser(session);
+      const activeBtn = document.querySelector('#amountOptions .active');
+      if(!activeBtn){ alert('Pilih nominal penarikan.'); return; }
+      const amount = parseInt(activeBtn.dataset.amount);
+      const walletNumber = el('walletNumber').value.trim();
+      const walletName = el('walletName').value.trim();
+      if(!walletNumber || !walletName){ alert('Lengkapi data e-wallet.'); return; }
+      if((u.wallet?.number||'')!==walletNumber || (u.wallet?.name||'')!==walletName){
+        u.wallet = { number:walletNumber, name:walletName }; saveUser(u);
+      }
+      const cfg = getConfig();
+      // Invite requirements
+      if(amount===15000 && (u.referrals||0) < cfg.minInviteFor15000){
+        alert(`Penarikan Rp 15.000 membutuhkan minimal ${cfg.minInviteFor15000} undangan.`);
+        return;
+      }
+      if(amount===30000 && (u.referrals||0) < cfg.minInviteFor30000){
+        alert(`Penarikan Rp 30.000 membutuhkan minimal ${cfg.minInviteFor30000} undangan.`);
+        return;
+      }
+      if((u.balance||0) < amount){
+        alert('Saldo tidak mencukupi.');
+        return;
+      }
+      const w = {
+        id: wid(),
+        userId: u.id,
+        username: u.username,
+        amount,
+        wallet: { number: walletNumber, name: walletName },
+        status: 'PENDING',
+        createdAt: Date.now()
+      };
+      const arr = getWithdraws();
+      arr.push(w); setWithdraws(arr);
+      // Freeze amount from balance while pending (optional), here we deduct immediately
+      u.balance = (u.balance||0) - amount;
+      u.history.push({ type:'withdraw_request', amount, status:'PENDING', at:Date.now() });
+      saveUser(u);
+      renderMyWithdraws(u);
+      renderHistory(u);
+      el('balance').textContent = money(u.balance);
+      el('accBalance').textContent = money(u.balance);
+      alert('Pengajuan penarikan dibuat. Status: PENDING sampai admin konfirmasi.');
+      // Re-render amount options (maybe remove 200 if first time just used)
+      renderAmounts(u);
+    };
+
+    function renderMyWithdraws(u){
+      const list = el('myWithdraws');
+      const arr = getWithdraws().filter(x=>x.userId===u.id).sort((a,b)=>b.createdAt-a.createdAt);
+      list.innerHTML='';
+      if(arr.length===0){ list.innerHTML='<div class="muted">Belum ada pengajuan.</div>'; return; }
+      arr.forEach(w=>{
+        const item = document.createElement('div');
+        item.className='list-item';
+        item.innerHTML=`
+          <div class="left">
+            <div class="icon"><i class="fa-solid fa-money-bill"></i></div>
+            <div>
+              <div>Rp ${money(w.amount)} • ${new Date(w.createdAt).toLocaleString('id-ID')}</div>
+              <div class="muted">Status: ${w.status}</div>
+            </div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function renderHistory(u){
+      const list = el('historyList');
+      list.innerHTML='';
+      const items = (u.history||[]).slice().sort((a,b)=>b.at-a.at);
+      if(items.length===0){ list.innerHTML='<div class="muted">Belum ada riwayat.</div>'; return; }
+      items.forEach(h=>{
+        const div = document.createElement('div');
+        div.className='list-item';
+        const label = h.type==='reward' ? 'Hadiah misi' : (h.type==='withdraw_request' ? 'Ajukan penarikan' : h.type);
+        const status = h.status ? ` • ${h.status}` : '';
+        div.innerHTML = `
+          <div class="left">
+            <div class="icon"><i class="fa-solid fa-receipt"></i></div>
+            <div>
+              <div>${label}${status}</div>
+              <div class="muted">Rp ${money(h.amount||0)} • ${new Date(h.at).toLocaleString('id-ID')}</div>
+            </div>
+          </div>`;
+        list.appendChild(div);
+      });
+    }
+
+    // ====== Rewards ======
+    function randReward(game){
+      const cfg=getConfig();
+      const arr = (cfg.rewards?.[game] && Array.isArray(cfg.rewards[game]) && cfg.rewards[game].length>0)
+        ? cfg.rewards[game] : [150,200,250,300];
+      return arr[Math.floor(Math.random()*arr.length)];
+    }
+    function grantReward(game,label='Hadiah misi'){
+      const session = getSession(); if(!session){ alert('Masuk dulu.'); return; }
+      const u = findUser(session);
+      const amount = randReward(game);
+      u.balance = (u.balance||0) + amount;
+      u.history.push({ type:'reward', game, amount, at:Date.now() });
+      saveUser(u);
+      el('balance').textContent = money(u.balance);
+      el('accBalance').textContent = money(u.balance);
+      alert(`${label}: Rp ${money(amount)} ditambahkan ke saldo.`);
+      renderHistory(u);
+    }
+
+    // ====== Misi: Snake ======
+    const snakeCanvas = el('snakeCanvas');
+    const snakeCtx = snakeCanvas.getContext('2d');
+    let snake = [], food=null, dir={x:1,y:0}, timer=null, alive=false;
+
+    function resetSnake(){
+      snake = [{x:5,y:5},{x:4,y:5},{x:3,y:5}];
+      dir={x:1,y:0}; food=placeFood(); alive=true;
+      drawSnake();
+      el('snakeStatus').textContent='Siap dimainkan.';
+    }
+    function placeFood(){
+      return { x: Math.floor(Math.random()*12), y: Math.floor(Math.random()*12) };
+    }
+    function drawSnake(){
+      snakeCtx.fillStyle='#0c1016'; snakeCtx.fillRect(0,0,240,240);
+      // grid
+      snakeCtx.strokeStyle='#1f2732';
+      for(let i=0;i<=240;i+=20){ snakeCtx.beginPath(); snakeCtx.moveTo(i,0); snakeCtx.lineTo(i,240); snakeCtx.stroke(); snakeCtx.beginPath(); snakeCtx.moveTo(0,i); snakeCtx.lineTo(240,i); snakeCtx.stroke(); }
+      // food
+      snakeCtx.fillStyle='#f75'; snakeCtx.fillRect(food.x*20, food.y*20, 20, 20);
+      // snake
+      snakeCtx.fillStyle='#4f8cff';
+      snake.forEach((p,i)=>{ snakeCtx.fillRect(p.x*20, p.y*20, 20, 20); });
+    }
+    function stepSnake(){
+      if(!alive) return;
+      const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+      // bounds
+      if(head.x<0||head.y<0||head.x>11||head.y>11||snake.some(p=>p.x===head.x&&p.y===head.y)){
+        alive=false; clearInterval(timer); el('snakeStatus').textContent='Game over.';
+        // reward only if length >= 6 for demo
+        if(snake.length>=6){ grantReward('snake','Hadiah Snake'); }
+        return;
+      }
+      snake.unshift(head);
+      // eat
+      if(head.x===food.x && head.y===food.y){
+        food=placeFood();
+      }else{
+        snake.pop();
+      }
+      drawSnake();
+    }
+    el('startSnake').onclick = ()=>{ resetSnake(); clearInterval(timer); timer=setInterval(stepSnake, 180); el('snakeStatus').textContent='Berjalan...'; };
+    el('upBtn').onclick = ()=>{ if(dir.y===0) dir={x:0,y:-1}; };
+    el('downBtn').onclick = ()=>{ if(dir.y===0) dir={x:0,y:1}; };
+    el('leftBtn').onclick = ()=>{ if(dir.x===0) dir={x:-1,y:0}; };
+    el('rightBtn').onclick = ()=>{ if(dir.x===0) dir={x:1,y:0}; };
+    document.addEventListener('keydown',(e)=>{
+      if(!el('misiTab').classList.contains('active')) return;
+      if(e.key==='ArrowUp'&&dir.y===0) dir={x:0,y:-1};
+      if(e.key==='ArrowDown'&&dir.y===0) dir={x:0,y:1};
+      if(e.key==='ArrowLeft'&&dir.x===0) dir={x:-1,y:0};
+      if(e.key==='ArrowRight'&&dir.x===0) dir={x:1,y:0};
+    });
+    el('openSnake').onclick = ()=>{ el('snakeCard').classList.remove('hidden'); };
+
+    // ====== Misi: Riddle (Teka-teki) ======
+    el('openRiddle').onclick = ()=>{
+      const q = 'Aku punya daun, namun bukan tumbuhan; punya jari, tetapi bukan manusia. Apakah aku?';
+      const ans = prompt(q+'\n\nJawaban satu kata:');
+      if(!ans) return;
+      const normalized = ans.trim().toLowerCase();
+      // Simple accepted answers
+      const accepts = ['buku','sarung tangan','handschoen','glove'];
+      if(accepts.includes(normalized)){
+        grantReward('riddle','Hadiah Teka-teki');
+      }else{
+        alert('Salah. Coba lagi!');
+      }
+    };
+
+    // ====== Misi: Math ======
+    el('openMath').onclick = ()=>{
+      const a = Math.floor(Math.random()*20)+10;
+      const b = Math.floor(Math.random()*15)+5;
+      const c = Math.floor(Math.random()*10)+2;
+      const res = a + b * c;
+      const ans = prompt(`Hitung: ${a} + ${b} × ${c} = ?`);
+      if(ans===null) return;
+      if(parseInt(ans)===res){ grantReward('math','Hadiah Matematika'); }
+      else{ alert('Salah. Jawaban: '+res); }
+    };
+
+    // ====== Misi: Quiz EN ======
+    el('openQuizEN').onclick = ()=>{
+      const q = [
+        {t:'Choose the correct word: "She ____ to school every day."', c:'goes'},
+        {t:'What is the synonym of "quick"?', c:'fast'},
+        {t:'Past tense of "write" is ____.', c:'wrote'}
+      ];
+      const pick = q[Math.floor(Math.random()*q.length)];
+      const a = prompt(pick.t);
+      if(!a) return;
+      if(a.trim().toLowerCase()===pick.c){ grantReward('quizEN','Hadiah Quiz Inggris'); }
+      else{ alert('Jawaban salah.'); }
+    };
+
+    // ====== Misi: Invite (Undang Teman) ======
+    el('openInvite').onclick = ()=>{
+      const name = prompt('Masukkan nama teman yang diundang (simulasi):');
+      if(!name) return;
+      const session = getSession(); if(!session){ alert('Masuk dulu.'); return; }
+      const u = findUser(session);
+      u.referrals = (u.referrals||0) + 1;
+      saveUser(u);
+      el('refCount').textContent = u.referrals;
+      el('accRef').textContent = u.referrals;
+      grantReward('invite','Hadiah Undang Teman');
+    };
+
+    // ====== Misi: Quiz ID ======
+    el('openQuizID').onclick = ()=>{
+      const q = [
+        {t:'Ibu kota Indonesia adalah _____.', c:'jakarta'},
+        {t:'Sinonim kata "cepat" adalah _____.', c:'pantas'}, // intentionally tricky
+        {t:'Kebalikan kata "besar" adalah _____.', c:'kecil'}
+      ];
+      const pick = q[Math.floor(Math.random()*q.length)];
+      const a = prompt(pick.t);
+      if(!a) return;
+      if(a.trim().toLowerCase()===pick.c){ grantReward('quizID','Hadiah Quiz Indonesia'); }
+      else{ alert('Jawaban salah.'); }
+    };
+
+    // ====== Settings actions ======
+    el('changePassBtn').onclick = ()=>{
+      const session=getSession(); if(!session){ alert('Masuk dulu.'); return; }
+      const u = findUser(session);
+      const cur = el('curPass').value;
+      const nw = el('newPass').value;
+      if(!cur||!nw){ el('changePassMsg').textContent='Lengkapi data.'; return; }
+      if(hash(cur)!==u.passwordHash){ el('changePassMsg').textContent='Password saat ini salah.'; return; }
+      if(nw.length<6){ el('changePassMsg').textContent='Password baru minimal 6 karakter.'; return; }
+      u.passwordHash = hash(nw); saveUser(u);
+      el('changePassMsg').textContent='Password berhasil diubah.';
+      el('curPass').value=''; el('newPass').value='';
+    };
+
+    el('saveWalletBtn').onclick = ()=>{
+      const session=getSession(); if(!session){ alert('Masuk dulu.'); return; }
+      const u = findUser(session);
+      const num = el('setWalletNumber').value.trim();
+      const nm = el('setWalletName').value.trim();
+      if(!num||!nm){ el('saveWalletMsg').textContent='Lengkapi data.'; return; }
+      u.wallet = { number:num, name:nm }; saveUser(u);
+      el('saveWalletMsg').textContent='Data rekening diperbarui.';
+      el('walletNumber').value=num; el('walletName').value=nm;
+    };
+
+    // ====== Anti-cheat (deterrent) ======
+    function initAntiCheat(){
+      const cfg=getConfig();
+      if(!cfg.antiCheatEnabled) return;
+      // Block context menu & copy/cut/paste
+      document.addEventListener('contextmenu', e=>e.preventDefault());
+      ['copy','cut','paste','selectstart','dragstart'].forEach(evt=>{
+        document.addEventListener(evt, e=>{ e.preventDefault(); return false; });
+      });
+      // Attempt to intercept PrintScreen (cannot fully prevent)
+      document.addEventListener('keydown',(e)=>{
+        if(e.key==='PrintScreen'){
+          e.preventDefault();
+          alert('Screenshot dinonaktifkan.');
+        }
+      });
+      // Blur sensitive areas when tab hidden
+      document.addEventListener('visibilitychange', ()=>{
+        if(document.hidden){
+          document.body.style.filter='blur(6px) brightness(.8)';
+        }else{
+          document.body.style.filter='none';
+        }
+      });
+    }
+
+    // ====== Open snake card toggle ======
+    el('openSnake').addEventListener('click', ()=>{ el('snakeCard').classList.remove('hidden'); });
+
+  </script>
+</body>
+</html>
